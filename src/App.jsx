@@ -4,10 +4,11 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import Routes from './Routes';
 import history from './services/history';
+import customTheme from './styles/theme';
 
 function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={customTheme}>
       <Router history={history}>
         <Routes />
       </Router>
