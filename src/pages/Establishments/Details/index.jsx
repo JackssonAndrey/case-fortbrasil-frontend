@@ -39,11 +39,13 @@ const initialStateEstablishment = {
 export default function DetailsEstablishment({ match }) {
   const establishmentId = match.params.id;
   const [establishmentData, setEstablishmentData] = useState(initialStateEstablishment);
+  const [address, setAddress] = useState({});
 
   useEffect(() => {
     (async () => {
       try {
         const { data } = await api.get(`/establishments/${establishmentId}`);
+        setAddress(data.address);
         setEstablishmentData(data);
       } catch (error) {
         console.log(error.message);
@@ -54,6 +56,11 @@ export default function DetailsEstablishment({ match }) {
   function onChangeInputs(e) {
     const { name, value } = e.target;
     setEstablishmentData({ ...establishmentData, [name]: value });
+  }
+
+  function onChangeInputsAddress(e) {
+    const { name, value } = e.target;
+    setAddress({ ...address, [name]: value });
   }
 
   return (
@@ -76,7 +83,6 @@ export default function DetailsEstablishment({ match }) {
         maxWidth="container.lg"
       >
         <Box
-          marginTop="40px"
           marginBottom="4"
         >
           <Breadcrumb spacing="8px" separator={<ChevronRightIcon color="gray.500" />} color="gray.300">
@@ -91,26 +97,21 @@ export default function DetailsEstablishment({ match }) {
         </Box>
 
         <Box
-          display="flex"
-          justifyContent="flex-start"
-          alignContent="flex-start"
-          width="100%"
-          marginBottom="4"
-        >
-          <Heading>
-            Dados de
-            {' '}
-            {establishmentData.companyName}
-          </Heading>
-        </Box>
-
-        <Box
           width="100%"
           padding="30px"
           backgroundColor="whiteAlpha.200"
           borderRadius="md"
           shadow="md"
         >
+          <Box
+            marginBottom="4"
+          >
+            <Heading>
+              Dados de
+              {' '}
+              {establishmentData.companyName}
+            </Heading>
+          </Box>
           <form>
             <Box
               width="100%"
@@ -262,101 +263,110 @@ export default function DetailsEstablishment({ match }) {
                 />
               </FormControl>
             </Box>
-
-            <Box>
-              <Heading>Endereço</Heading>
-            </Box>
-
-            <FormControl id="zipCode" mb="10px" mr="10px" width="20%">
-              <FormLabel
-                fontWeight="normal"
-                marginBottom={0}
-              >
-                CEP
-              </FormLabel>
-              <Input
-                type="text"
-                focusBorderColor="blue.700"
-                name="zipCode"
-                onChange={(e) => onChangeInputs(e)}
-                value={establishmentData.zipCode}
-                disabled
-              />
-            </FormControl>
-
-            <Box
-              width="100%"
-              display="flex"
-            >
-              <FormControl id="street" mb="10px" mr="10px" width="50%">
-                <FormLabel
-                  fontWeight="normal"
-                  marginBottom={0}
-                >
-                  Rua
-                </FormLabel>
-                <Input
-                  type="text"
-                  focusBorderColor="blue.700"
-                  name="street"
-                  onChange={(e) => onChangeInputs(e)}
-                  value={establishmentData.street}
-                  disabled
-                />
-              </FormControl>
-
-              <FormControl id="number" mb="10px" mr="10px" width="20%">
-                <FormLabel
-                  fontWeight="normal"
-                  marginBottom={0}
-                >
-                  Número
-                </FormLabel>
-                <Input
-                  type="text"
-                  focusBorderColor="blue.700"
-                  name="number"
-                  onChange={(e) => onChangeInputs(e)}
-                  value={establishmentData.number}
-                  disabled
-                />
-              </FormControl>
-
-              <FormControl id="city" mb="10px" width="30%">
-                <FormLabel
-                  fontWeight="normal"
-                  marginBottom={0}
-                >
-                  Cidade
-                </FormLabel>
-                <Input
-                  type="text"
-                  focusBorderColor="blue.700"
-                  name="city"
-                  onChange={(e) => onChangeInputs(e)}
-                  value={establishmentData.city}
-                  disabled
-                />
-              </FormControl>
-            </Box>
-
-            <FormControl id="complement" mb="10px" width="100%">
-              <FormLabel
-                fontWeight="normal"
-                marginBottom={0}
-              >
-                Complemento
-              </FormLabel>
-              <Input
-                type="text"
-                focusBorderColor="blue.700"
-                name="complement"
-                onChange={(e) => onChangeInputs(e)}
-                value={establishmentData.complement}
-                disabled
-              />
-            </FormControl>
           </form>
+        </Box>
+
+        <Box
+          width="100%"
+          padding="30px"
+          backgroundColor="whiteAlpha.200"
+          borderRadius="md"
+          shadow="md"
+          mt="4"
+        >
+          <Box mb="2">
+            <Heading>Endereço</Heading>
+          </Box>
+
+          <FormControl id="zipCode" mb="10px" mr="10px" width="20%">
+            <FormLabel
+              fontWeight="normal"
+              marginBottom={0}
+            >
+              CEP
+            </FormLabel>
+            <Input
+              type="text"
+              focusBorderColor="blue.700"
+              name="zipCode"
+              onChange={(e) => onChangeInputsAddress(e)}
+              value={address.zipCode}
+              disabled
+            />
+          </FormControl>
+
+          <Box
+            width="100%"
+            display="flex"
+          >
+            <FormControl id="street" mb="10px" mr="10px" width="50%">
+              <FormLabel
+                fontWeight="normal"
+                marginBottom={0}
+              >
+                Rua
+              </FormLabel>
+              <Input
+                type="text"
+                focusBorderColor="blue.700"
+                name="street"
+                onChange={(e) => onChangeInputsAddress(e)}
+                value={address.street}
+                disabled
+              />
+            </FormControl>
+
+            <FormControl id="number" mb="10px" mr="10px" width="20%">
+              <FormLabel
+                fontWeight="normal"
+                marginBottom={0}
+              >
+                Número
+              </FormLabel>
+              <Input
+                type="text"
+                focusBorderColor="blue.700"
+                name="number"
+                onChange={(e) => onChangeInputsAddress(e)}
+                value={address.number}
+                disabled
+              />
+            </FormControl>
+
+            <FormControl id="city" mb="10px" width="30%">
+              <FormLabel
+                fontWeight="normal"
+                marginBottom={0}
+              >
+                Cidade
+              </FormLabel>
+              <Input
+                type="text"
+                focusBorderColor="blue.700"
+                name="city"
+                onChange={(e) => onChangeInputsAddress(e)}
+                value={address.city}
+                disabled
+              />
+            </FormControl>
+          </Box>
+
+          <FormControl id="complement" mb="10px" width="100%">
+            <FormLabel
+              fontWeight="normal"
+              marginBottom={0}
+            >
+              Complemento
+            </FormLabel>
+            <Input
+              type="text"
+              focusBorderColor="blue.700"
+              name="complement"
+              onChange={(e) => onChangeInputsAddress(e)}
+              value={address.complement}
+              disabled
+            />
+          </FormControl>
         </Box>
         <Footer />
       </Container>

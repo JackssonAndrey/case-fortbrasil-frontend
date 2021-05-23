@@ -19,9 +19,13 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
+  Select,
+  CircularProgress,
+  useToast,
 } from '@chakra-ui/react';
+import axios from 'axios';
 
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons';
 import history from '../../services/history';
 import api from '../../services/api';
 
@@ -29,8 +33,15 @@ import TopMenu from '../../components/TopMenu';
 import Footer from '../../components/Footer';
 
 export default function Establishments() {
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [isHiddenLoadingDelete, setIsHiddenLoadingDelete] = useState(true);
   const [allEstablishments, setAllEstablishments] = useState([]);
+  const [ufs, setUfs] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedUf, setSelectedUf] = useState('0');
+  const [selectedCity, setSelectedCity] = useState('0');
+  const [establishmentId, setEstablishmentId] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -43,16 +54,96 @@ export default function Establishments() {
     })();
   }, []);
 
-  function openModalDelete() {
+  useEffect(() => {
+    axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then((response) => {
+      const ufInitials = response.data.map((uf) => uf.sigla);
+      setUfs(ufInitials);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedUf === '0') return;
+
+    axios.get(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
+      .then((response) => {
+        const cityNames = response.data.map((city) => city.nome);
+        setCities(cityNames);
+      });
+  }, [selectedUf]);
+
+  async function handleGetAllEstablishments() {
+    try {
+      const { data } = await api.get('/establishments/');
+      setAllEstablishments(data);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  function handleSelectUf(event) {
+    const uf = event.target.value;
+    setSelectedUf(uf);
+  }
+
+  function handleSelectCity(event) {
+    const city = event.target.value;
+    setSelectedCity(city);
+  }
+
+  function openModalDelete(id) {
     setIsOpen(true);
+    setEstablishmentId(id);
   }
 
   function closeModalDelete() {
     setIsOpen(false);
+    setEstablishmentId(0);
   }
 
   function redirectToEdit(id) {
     history.push(`/establishments/edit/${id}`);
+  }
+
+  function handleSearchByCity() {
+    const filtered = allEstablishments.filter((element) => element.address.city === selectedCity);
+    setAllEstablishments(filtered);
+  }
+
+  async function handleDelete() {
+    try {
+      await api.put(`/establishments/deactivate/${establishmentId}`);
+      setIsHiddenLoadingDelete(false);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Registro deletado',
+          description: 'Registro deletado com sucesso',
+          position: 'top',
+        });
+
+        const filtered = allEstablishments.filter((element) => element.id !== establishmentId);
+        setAllEstablishments(filtered);
+        closeModalDelete();
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingDelete(true);
+      }, 3000);
+    } catch (error) {
+      setIsHiddenLoadingDelete(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na exclusão',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingDelete(true);
+      }, 3000);
+    }
   }
 
   return (
@@ -88,11 +179,51 @@ export default function Establishments() {
 
         <Box
           display="flex"
-          justifyContent="flex-end"
-          alignContent="flex-end"
+          justifyContent="space-between"
+          alignContent="space-between"
           width="100%"
           paddingBottom="4"
         >
+          <Box
+            display="flex"
+            justifyContent="flex-start"
+            alignContent="flex-start"
+          >
+            <Select placeholder="Selecione o estado" onChange={(e) => handleSelectUf(e)}>
+              {
+                ufs.map((uf) => (
+                  <option key={uf} value={uf}>{uf}</option>
+                ))
+              }
+            </Select>
+
+            <Select placeholder="Pesquise por cidade" ml="3" onChange={(e) => handleSelectCity(e)}>
+              {
+                cities.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))
+              }
+            </Select>
+
+            <Button
+              variant="solid"
+              colorScheme="blue"
+              onClick={handleSearchByCity}
+              ml="4"
+            >
+              <SearchIcon />
+            </Button>
+
+            <Button
+              variant="solid"
+              colorScheme="orange"
+              onClick={handleGetAllEstablishments}
+              ml="4"
+              padding="5"
+            >
+              Todos
+            </Button>
+          </Box>
           <Link to="/establishments/register">
             <Button variant="solid" colorScheme="blue">Novo</Button>
           </Link>
@@ -129,7 +260,7 @@ export default function Establishments() {
                 allEstablishments.map((establishment) => (
                   <Tr key={establishment.id}>
                     <Td>
-                      <Link to={`/establishments/edit/${establishment.id}`} className="link">
+                      <Link to={`/establishments/details/${establishment.id}`} className="link">
                         {establishment.companyName}
                       </Link>
                     </Td>
@@ -149,7 +280,7 @@ export default function Establishments() {
                       <Button
                         variant="ghost"
                         colorScheme="red"
-                        onClick={openModalDelete}
+                        onClick={() => openModalDelete(establishment.id)}
                       >
                         <DeleteIcon />
                       </Button>
@@ -177,7 +308,20 @@ export default function Establishments() {
             <Button colorScheme="blue" mr={3} onClick={closeModalDelete}>
               Cacelar
             </Button>
-            <Button variant="ghost" colorScheme="red">Apagar</Button>
+            <Button
+              variant="ghost"
+              colorScheme="red"
+              onClick={handleDelete}
+            >
+              Apagar
+              <CircularProgress
+                hidden={isHiddenLoadingDelete}
+                size={5}
+                ml="2"
+                isIndeterminate
+                color="blue.1000"
+              />
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

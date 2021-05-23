@@ -99,7 +99,11 @@ export default function Profile() {
 
   async function changePassword() {
     try {
-      await api.put('/users/password', passwordData);
+      await api.put('/users/password', {
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      });
+      console.log(passwordData);
       setIsHiddenLoadingChangePassword(false);
       setTimeout(() => {
         toast({
@@ -109,6 +113,7 @@ export default function Profile() {
           description: 'Senha atualziada com sucesso',
           position: 'top',
         });
+        setPasswordData(initialPasswordState);
       }, 2000);
       setTimeout(() => {
         setIsHiddenLoadingChangePassword(true);
@@ -142,6 +147,7 @@ export default function Profile() {
           description: 'Sua conta foi excluída',
           position: 'top',
         });
+        setIsHiddenLoadingDeactivateAccount(true);
       }, 2000);
       setTimeout(() => {
         handleLogout();

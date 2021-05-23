@@ -53,7 +53,7 @@ export default function RegisterEstablishment() {
 
     try {
       await api.post('/establishments', establishmentData);
-      setIsHiddenLoadingRegister(true);
+      setIsHiddenLoadingRegister(false);
       setTimeout(() => {
         toast({
           status: 'success',

@@ -18,7 +18,6 @@ import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
-import history from '../../../services/history';
 
 import './styles.css';
 
@@ -45,12 +44,15 @@ export default function EditEstablishment({ match }) {
   const establishmentId = match.params.id;
   const [establishmentData, setEstablishmentData] = useState(initialStateEstablishment);
   const [isHiddenLoadingEdit, setIsHiddenLoadingEdit] = useState(true);
+  const [isHiddenLoadingEditAddress, setIsHiddenLoadingEditAddress] = useState(true);
+  const [address, setAddress] = useState({});
 
   useEffect(() => {
     (async () => {
       try {
         const { data } = await api.get(`/establishments/${establishmentId}`);
         setEstablishmentData(data);
+        setAddress(data.address);
       } catch (error) {
         console.log(error.message);
       }
@@ -60,6 +62,11 @@ export default function EditEstablishment({ match }) {
   function onChangeInputs(e) {
     const { name, value } = e.target;
     setEstablishmentData({ ...establishmentData, [name]: value });
+  }
+
+  function onChangeInputsAddress(e) {
+    const { name, value } = e.target;
+    setAddress({ ...address, [name]: value });
   }
 
   async function handleEdit(e) {
@@ -72,14 +79,14 @@ export default function EditEstablishment({ match }) {
         toast({
           status: 'success',
           duration: 5000,
-          title: 'Falha na atualizaçaõ',
-          description: '',
+          title: 'Atualização feita',
+          description: 'Dados atualizados com sucesso',
           position: 'top',
         });
       }, 2000);
       setTimeout(() => {
-        history.push(`/establishments/details/${establishmentId}`);
-      }, 4000);
+        setIsHiddenLoadingEdit(true);
+      }, 3000);
     } catch (error) {
       setIsHiddenLoadingEdit(false);
       setTimeout(() => {
@@ -93,6 +100,41 @@ export default function EditEstablishment({ match }) {
       }, 2000);
       setTimeout(() => {
         setIsHiddenLoadingEdit(true);
+      }, 3000);
+    }
+  }
+
+  async function handleEditAddress(e) {
+    e.preventDefault();
+
+    try {
+      await api.put('/address/', address);
+      setIsHiddenLoadingEditAddress(false);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Atualização feita',
+          description: 'Dados de endereço atualizados com sucesso',
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingEditAddress(true);
+      }, 3000);
+    } catch (error) {
+      setIsHiddenLoadingEditAddress(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na atualizaçaõ',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingEditAddress(true);
       }, 3000);
     }
   }
@@ -117,7 +159,6 @@ export default function EditEstablishment({ match }) {
         maxWidth="container.lg"
       >
         <Box
-          marginTop="40px"
           marginBottom="4"
         >
           <Breadcrumb spacing="8px" separator={<ChevronRightIcon color="gray.500" />} color="gray.300">
@@ -132,26 +173,21 @@ export default function EditEstablishment({ match }) {
         </Box>
 
         <Box
-          display="flex"
-          justifyContent="flex-start"
-          alignContent="flex-start"
-          width="100%"
-          marginBottom="4"
-        >
-          <Heading>
-            Dados de
-            {' '}
-            {establishmentData.companyName}
-          </Heading>
-        </Box>
-
-        <Box
           width="100%"
           padding="30px"
           backgroundColor="whiteAlpha.200"
           borderRadius="md"
           shadow="md"
         >
+          <Box
+            marginBottom="4"
+          >
+            <Heading>
+              Dados de
+              {' '}
+              {establishmentData.companyName}
+            </Heading>
+          </Box>
           <form onSubmit={(e) => handleEdit(e)}>
             <Box
               width="100%"
@@ -296,9 +332,42 @@ export default function EditEstablishment({ match }) {
               </FormControl>
             </Box>
 
-            <Box>
-              <Heading>Endereço</Heading>
+            <Box
+              display="flex"
+              justifyContent="flex-end"
+              marginTop="30px"
+            >
+              <Button
+                type="submit"
+                variant="solid"
+                colorScheme="blue"
+              >
+                Salvar Alterações
+                <CircularProgress
+                  hidden={isHiddenLoadingEdit}
+                  size={5}
+                  ml="2"
+                  isIndeterminate
+                  color="blue.1000"
+                />
+              </Button>
             </Box>
+          </form>
+        </Box>
+        <Box
+          width="100%"
+          padding="30px"
+          backgroundColor="whiteAlpha.200"
+          borderRadius="md"
+          shadow="md"
+          mt="4"
+        >
+          <Box
+            mb="2"
+          >
+            <Heading>Endereço</Heading>
+          </Box>
+          <form onSubmit={(e) => handleEditAddress(e)}>
 
             <FormControl id="zipCode" mb="10px" mr="10px" width="20%">
               <FormLabel
@@ -311,8 +380,8 @@ export default function EditEstablishment({ match }) {
                 type="text"
                 focusBorderColor="blue.700"
                 name="zipCode"
-                onChange={(e) => onChangeInputs(e)}
-                value={establishmentData.zipCode}
+                onChange={(e) => onChangeInputsAddress(e)}
+                value={address.zipCode}
               />
             </FormControl>
 
@@ -320,6 +389,7 @@ export default function EditEstablishment({ match }) {
               width="100%"
               display="flex"
             >
+
               <FormControl id="street" mb="10px" mr="10px" width="50%">
                 <FormLabel
                   fontWeight="normal"
@@ -331,8 +401,8 @@ export default function EditEstablishment({ match }) {
                   type="text"
                   focusBorderColor="blue.700"
                   name="street"
-                  onChange={(e) => onChangeInputs(e)}
-                  value={establishmentData.street}
+                  onChange={(e) => onChangeInputsAddress(e)}
+                  value={address.street}
                 />
               </FormControl>
 
@@ -347,8 +417,8 @@ export default function EditEstablishment({ match }) {
                   type="text"
                   focusBorderColor="blue.700"
                   name="number"
-                  onChange={(e) => onChangeInputs(e)}
-                  value={establishmentData.number}
+                  onChange={(e) => onChangeInputsAddress(e)}
+                  value={address.number}
                 />
               </FormControl>
 
@@ -363,8 +433,8 @@ export default function EditEstablishment({ match }) {
                   type="text"
                   focusBorderColor="blue.700"
                   name="city"
-                  onChange={(e) => onChangeInputs(e)}
-                  value={establishmentData.city}
+                  onChange={(e) => onChangeInputsAddress(e)}
+                  value={address.city}
                 />
               </FormControl>
             </Box>
@@ -380,8 +450,8 @@ export default function EditEstablishment({ match }) {
                 type="text"
                 focusBorderColor="blue.700"
                 name="complement"
-                onChange={(e) => onChangeInputs(e)}
-                value={establishmentData.complement}
+                onChange={(e) => onChangeInputsAddress(e)}
+                value={address.complement}
               />
             </FormControl>
 
@@ -397,7 +467,7 @@ export default function EditEstablishment({ match }) {
               >
                 Salvar Alterações
                 <CircularProgress
-                  hidden={isHiddenLoadingEdit}
+                  hidden={isHiddenLoadingEditAddress}
                   size={5}
                   ml="2"
                   isIndeterminate

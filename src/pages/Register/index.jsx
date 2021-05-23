@@ -22,7 +22,7 @@ import history from '../../services/history';
 const initialUserDataSate = {
   firstName: '',
   lastName: '',
-  mail: '',
+  email: '',
   password: '',
 };
 
@@ -41,7 +41,7 @@ export default function Register() {
 
     try {
       await api.post('/users', userData);
-      setIsHiddenLoadingRegister(true);
+      setIsHiddenLoadingRegister(false);
       setTimeout(() => {
         toast({
           status: 'success',
@@ -153,9 +153,9 @@ export default function Register() {
               <Input
                 type="email"
                 focusBorderColor="blue.700"
-                name="lastName"
+                name="email"
                 onChange={(e) => onChangeInputs(e)}
-                value={userData.mail}
+                value={userData.email}
               />
             </FormControl>
 
@@ -169,7 +169,7 @@ export default function Register() {
               <Input
                 type="password"
                 focusBorderColor="blue.700"
-                name="lastName"
+                name="password"
                 onChange={(e) => onChangeInputs(e)}
                 value={userData.password}
               />
