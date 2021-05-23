@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
+import api from '../../../services/api';
 
 const initialStateEstablishment = {
   companyName: '',
@@ -43,7 +44,13 @@ export default function RegisterEstablishment() {
 
   async function handleRegister(e) {
     e.preventDefault();
-    console.log(establishmentData);
+
+    try {
+      await api.post('/establishments', establishmentData);
+      alert('Cadastrado com sucesso');
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   return (

@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Container,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   Box,
   Button,
   Heading,
@@ -25,11 +23,24 @@ import {
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import history from '../../services/history';
+import api from '../../services/api';
 
 import TopMenu from '../../components/TopMenu';
 
 export default function Establishments() {
   const [isOpen, setIsOpen] = useState(false);
+  const [allEstablishments, setAllEstablishments] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get('/establishments/');
+        setAllEstablishments(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    })();
+  }, []);
 
   function openModalDelete() {
     setIsOpen(true);
@@ -98,7 +109,6 @@ export default function Establishments() {
         >
 
           <Table variant="simple">
-            <TableCaption>Imperial to metric conversion factors</TableCaption>
             <Thead>
               <Tr>
                 <Th>Razão Social</Th>
@@ -109,100 +119,39 @@ export default function Establishments() {
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>inches</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>
-                  <Button
-                    variant="ghost"
-                    colorScheme="orange"
-                  >
-                    <EditIcon />
-                  </Button>
+              {allEstablishments.length === 0 && (
+                <Tr>
+                  <Td colSpan="12" textAlign="center">Nenhum estabelecimento cadastrado.</Td>
+                </Tr>
+              )}
+              {
+                allEstablishments.map((establishment) => (
+                  <Tr key={establishment.id}>
+                    <Td>{establishment.companyName}</Td>
+                    <Td>{establishment.cnpj}</Td>
+                    <Td>{establishment.mail}</Td>
+                    <Td>{establishment.phone}</Td>
+                    <Td>
+                      <Button
+                        variant="ghost"
+                        colorScheme="orange"
+                        onClick={() => redirectToEdit(establishment.id)}
+                      >
+                        <EditIcon />
+                      </Button>
 
-                  <Button
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={openModalDelete}
-                  >
-                    <DeleteIcon />
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>inches</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>
-                  <Button
-                    variant="ghost"
-                    colorScheme="orange"
-                    onClick={() => redirectToEdit(1)}
-                  >
-                    <EditIcon />
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={openModalDelete}
-                  >
-                    <DeleteIcon />
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>inches</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>
-                  <Button
-                    variant="ghost"
-                    colorScheme="orange"
-                    onClick={() => redirectToEdit(1)}
-                  >
-                    <EditIcon />
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={openModalDelete}
-                  >
-                    <DeleteIcon />
-                  </Button>
-                </Td>
-              </Tr>
+                      <Button
+                        variant="ghost"
+                        colorScheme="red"
+                        onClick={openModalDelete}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))
+              }
             </Tbody>
-            <Tfoot>
-              <Tr>
-                <Td>inches</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>millimetres (mm)</Td>
-                <Td>
-                  <Button
-                    variant="ghost"
-                    colorScheme="orange"
-                    onClick={() => redirectToEdit(1)}
-                  >
-                    <EditIcon />
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={openModalDelete}
-                  >
-                    <DeleteIcon />
-                  </Button>
-                </Td>
-              </Tr>
-            </Tfoot>
           </Table>
         </Box>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Container,
@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
+import api from '../../../services/api';
 
 import './styles.css';
 
@@ -39,6 +40,17 @@ export default function EditEstablishment({ match }) {
   const establishmentId = match.params.id;
   const [establishmentData, setEstablishmentData] = useState(initialStateEstablishment);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get(`/establishments/${establishmentId}`);
+        setEstablishmentData(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    })();
+  }, []);
+
   function onChangeInputs(e) {
     const { name, value } = e.target;
     setEstablishmentData({ ...establishmentData, [name]: value });
@@ -46,8 +58,13 @@ export default function EditEstablishment({ match }) {
 
   async function handleRegister(e) {
     e.preventDefault();
-    console.log(establishmentData);
-    console.log(establishmentId);
+
+    try {
+      await api.put('/establishments', establishmentData);
+      alert('Atualizado com sucesso');
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Container,
@@ -10,10 +10,10 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Button,
 } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
+import api from '../../../services/api';
 
 import './styles.css';
 
@@ -39,15 +39,20 @@ export default function DetailsEstablishment({ match }) {
   const establishmentId = match.params.id;
   const [establishmentData, setEstablishmentData] = useState(initialStateEstablishment);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get(`/establishments/${establishmentId}`);
+        setEstablishmentData(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    })();
+  }, []);
+
   function onChangeInputs(e) {
     const { name, value } = e.target;
     setEstablishmentData({ ...establishmentData, [name]: value });
-  }
-
-  async function handleRegister(e) {
-    e.preventDefault();
-    console.log(establishmentData);
-    console.log(establishmentId);
   }
 
   return (
@@ -105,7 +110,7 @@ export default function DetailsEstablishment({ match }) {
           borderRadius="md"
           shadow="md"
         >
-          <form onSubmit={(e) => handleRegister(e)}>
+          <form>
             <Box
               width="100%"
               display="flex"
@@ -350,20 +355,6 @@ export default function DetailsEstablishment({ match }) {
                 disabled
               />
             </FormControl>
-
-            <Box
-              display="flex"
-              justifyContent="flex-end"
-              marginTop="30px"
-            >
-              <Button
-                type="submit"
-                variant="solid"
-                colorScheme="blue"
-              >
-                Salvar Alterações
-              </Button>
-            </Box>
           </form>
         </Box>
       </Container>

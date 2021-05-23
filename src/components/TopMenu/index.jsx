@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import {
@@ -17,9 +17,12 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react';
 
+import { Context } from '../../Context/AuthContext';
+
 import './styles.css';
 
 export default function TopMenu() {
+  const { handleLogout } = useContext(Context);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -80,7 +83,7 @@ export default function TopMenu() {
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Cacelar
             </Button>
-            <Button variant="ghost" colorScheme="red">Sair</Button>
+            <Button variant="ghost" colorScheme="red" onClick={handleLogout}>Sair</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

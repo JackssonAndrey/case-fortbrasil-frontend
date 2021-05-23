@@ -46,7 +46,8 @@ export default function useAuth() {
 
   function handleLogout() {
     setAuthenticated(false);
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     api.defaults.headers.Authorization = undefined;
 
     history.push('/');

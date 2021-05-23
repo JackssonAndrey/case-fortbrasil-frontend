@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -14,10 +14,12 @@ import {
   Center,
 } from '@chakra-ui/react';
 
+import { Context } from '../../Context/AuthContext';
+
 export default function Login() {
-  async function handleSubmitForm(e) {
-    e.preventDefault();
-  }
+  const { handleLogin } = useContext(Context);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <Container
@@ -53,7 +55,7 @@ export default function Login() {
 
           <Spacer />
 
-          <form style={{ width: '100%' }} onSubmit={(e) => handleSubmitForm(e)}>
+          <form style={{ width: '100%' }} onSubmit={(e) => handleLogin(e, email, password)}>
             <FormControl id="email" mb="10px">
               <FormLabel
                 fontWeight="normal"
@@ -61,7 +63,12 @@ export default function Login() {
               >
                 Endereço de email
               </FormLabel>
-              <Input type="email" focusBorderColor="blue.700" />
+              <Input
+                type="email"
+                focusBorderColor="blue.700"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </FormControl>
 
             <FormControl id="password" mb="30px">
@@ -71,7 +78,12 @@ export default function Login() {
               >
                 Sua senha
               </FormLabel>
-              <Input type="password" focusBorderColor="blue.700" />
+              <Input
+                type="password"
+                focusBorderColor="blue.700"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </FormControl>
 
             <FormControl mb="10px">

@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   Container, Box, FormControl, Input, FormLabel, Button, Heading, Text,
 } from '@chakra-ui/react';
 import TopMenu from '../../components/TopMenu';
+import api from '../../services/api';
 
 const initialUserDataSate = {
   firstName: '',
   lastName: '',
-  mail: '',
+  email: '',
   password: '',
 };
 
@@ -21,6 +22,17 @@ export default function Profile() {
   const [userData, setUserData] = useState(initialUserDataSate);
   const [passwordData, setPasswordData] = useState(initialPasswordState);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get('/users');
+        setUserData(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    })();
+  }, []);
+
   function onChangeInputs(e) {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
@@ -29,6 +41,18 @@ export default function Profile() {
   function onChangeInputsPassword(e) {
     const { name, value } = e.target;
     setPasswordData({ ...userData, [name]: value });
+  }
+
+  async function handleUpdateProfile() {
+    try {
+      const { data } = await api.put('/users', {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+      });
+      setUserData(data);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   return (
@@ -130,14 +154,15 @@ export default function Profile() {
             <Input
               type="email"
               focusBorderColor="blue.700"
-              name="lastName"
+              name="email"
               onChange={(e) => onChangeInputs(e)}
-              value={userData.mail}
+              disabled
+              value={userData.email}
             />
           </FormControl>
 
           <FormControl>
-            <Button variant="solid" colorScheme="blue">Salvar Alterações</Button>
+            <Button variant="solid" colorScheme="blue" onClick={handleUpdateProfile}>Salvar Alterações</Button>
           </FormControl>
         </Box>
 
