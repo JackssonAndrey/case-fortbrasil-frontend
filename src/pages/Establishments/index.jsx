@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Container,
@@ -13,13 +13,36 @@ import {
   Box,
   Button,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Text,
 } from '@chakra-ui/react';
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import history from '../../services/history';
 
 import TopMenu from '../../components/TopMenu';
 
 export default function Establishments() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  function openModalDelete() {
+    setIsOpen(true);
+  }
+
+  function closeModalDelete() {
+    setIsOpen(false);
+  }
+
+  function redirectToEdit(id) {
+    history.push(`/establishments/edit/${id}`);
+  }
+
   return (
     <Container
       display="flex"
@@ -102,6 +125,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="red"
+                    onClick={openModalDelete}
                   >
                     <DeleteIcon />
                   </Button>
@@ -116,6 +140,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="orange"
+                    onClick={() => redirectToEdit(1)}
                   >
                     <EditIcon />
                   </Button>
@@ -123,6 +148,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="red"
+                    onClick={openModalDelete}
                   >
                     <DeleteIcon />
                   </Button>
@@ -137,6 +163,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="orange"
+                    onClick={() => redirectToEdit(1)}
                   >
                     <EditIcon />
                   </Button>
@@ -144,6 +171,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="red"
+                    onClick={openModalDelete}
                   >
                     <DeleteIcon />
                   </Button>
@@ -160,6 +188,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="orange"
+                    onClick={() => redirectToEdit(1)}
                   >
                     <EditIcon />
                   </Button>
@@ -167,6 +196,7 @@ export default function Establishments() {
                   <Button
                     variant="ghost"
                     colorScheme="red"
+                    onClick={openModalDelete}
                   >
                     <DeleteIcon />
                   </Button>
@@ -177,6 +207,25 @@ export default function Establishments() {
         </Box>
 
       </Container>
+
+      <Modal isOpen={isOpen} onClose={closeModalDelete}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Excluir registro</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja realmente excluir este registro?</Text>
+            <Text>Esta operação não pode ser desfeita.</Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={closeModalDelete}>
+              Cacelar
+            </Button>
+            <Button variant="ghost" colorScheme="red">Apagar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 }
