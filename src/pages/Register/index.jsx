@@ -1,20 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
   Container,
-  Box, Flex,
+  Box,
+  Flex,
   Heading,
   Spacer,
   FormControl,
   FormLabel,
   Input,
   Text,
-  Divider,
   Center,
 } from '@chakra-ui/react';
 
-export default function Login() {
+const initialUserDataSate = {
+  firstName: '',
+  lastName: '',
+  mail: '',
+  password: '',
+};
+
+export default function Register() {
+  const [userData, setUserData] = useState(initialUserDataSate);
+
+  function onChangeInputs(e) {
+    const { name, value } = e.target;
+    setUserData({ ...userData, [name]: value });
+  }
+
   async function handleSubmitForm(e) {
     e.preventDefault();
   }
@@ -48,12 +62,49 @@ export default function Login() {
             mb="20px"
             color="blue.600"
           >
-            Faça login para entrar no seu dashboard.
+            Crie sua conta agora mesmo.
           </Heading>
 
           <Spacer />
 
           <form style={{ width: '100%' }} onSubmit={(e) => handleSubmitForm(e)}>
+            <Box
+              width="100%"
+              display="flex"
+            >
+              <FormControl id="firstName" mb="10px" mr="10px" width="50%">
+                <FormLabel
+                  fontWeight="normal"
+                  marginBottom={0}
+                >
+                  Primeiro nome
+                </FormLabel>
+                <Input
+                  type="text"
+                  focusBorderColor="blue.700"
+                  name="firstName"
+                  onChange={(e) => onChangeInputs(e)}
+                  value={userData.firstName}
+                />
+              </FormControl>
+
+              <FormControl id="lastName" mb="10px" width="50%">
+                <FormLabel
+                  fontWeight="normal"
+                  marginBottom={0}
+                >
+                  Segundo nome
+                </FormLabel>
+                <Input
+                  type="text"
+                  focusBorderColor="blue.700"
+                  name="lastName"
+                  onChange={(e) => onChangeInputs(e)}
+                  value={userData.lastName}
+                />
+              </FormControl>
+            </Box>
+
             <FormControl id="email" mb="10px">
               <FormLabel
                 fontWeight="normal"
@@ -61,7 +112,13 @@ export default function Login() {
               >
                 Endereço de email
               </FormLabel>
-              <Input type="email" focusBorderColor="blue.700" />
+              <Input
+                type="email"
+                focusBorderColor="blue.700"
+                name="lastName"
+                onChange={(e) => onChangeInputs(e)}
+                value={userData.mail}
+              />
             </FormControl>
 
             <FormControl id="password" mb="30px">
@@ -71,7 +128,13 @@ export default function Login() {
               >
                 Sua senha
               </FormLabel>
-              <Input type="password" focusBorderColor="blue.700" />
+              <Input
+                type="password"
+                focusBorderColor="blue.700"
+                name="lastName"
+                onChange={(e) => onChangeInputs(e)}
+                value={userData.password}
+              />
             </FormControl>
 
             <FormControl mb="10px">
@@ -83,7 +146,7 @@ export default function Login() {
                 _hover={{ background: 'blue.1000' }}
                 _focus={{ border: 'none' }}
               >
-                Entrar
+                Salvar
               </Button>
             </FormControl>
 
@@ -93,38 +156,10 @@ export default function Login() {
               fontSize="sm"
             >
               <Link to="/">
-                Esqueceu a senha?
+                Já tem conta? Faça login.
               </Link>
             </Text>
           </form>
-
-          <Spacer />
-
-          <Flex
-            flexDirection="row"
-            alignItems="center"
-          >
-            <Divider />
-            <Text color="gray.500" fontSize="sm" margin="10px">ou</Text>
-            <Divider />
-          </Flex>
-
-          <Spacer />
-
-          <Box width="100%">
-            <Link to="/register">
-              <Button
-                variant="outline"
-                colorScheme="blue"
-                width="100%"
-                style={{ borderColor: 'blue.700', color: 'blue.700' }}
-                color="blue.700"
-                _focus={{ outline: 'none' }}
-              >
-                Criar conta
-              </Button>
-            </Link>
-          </Box>
 
           <Spacer />
 

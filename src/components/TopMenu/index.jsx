@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import {
   Box, Flex, Heading, Text, Button, useColorMode,
@@ -19,6 +20,7 @@ export default function TopMenu() {
       top="0"
       left="0"
       shadow="md"
+      backgroundColor="whiteAlpha.200"
     >
       <Flex
         alignContent="space-between"
@@ -35,8 +37,16 @@ export default function TopMenu() {
 
         <div className="top-menu">
           <ul>
-            <li><Text>Estabelecimentos</Text></li>
-            <li><Text>Perfil</Text></li>
+            <li>
+              <Link to="/establishments">
+                <Text>Estabelecimentos</Text>
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile">
+                <Text>Perfil</Text>
+              </Link>
+            </li>
           </ul>
         </div>
 

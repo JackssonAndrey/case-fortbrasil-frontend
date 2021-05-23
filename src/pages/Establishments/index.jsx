@@ -27,9 +27,10 @@ export default function Establishments() {
       justifyContent="center"
       flexDirection="column"
       maxWidth="100vw"
-      height="100vh"
+      height="100%"
       margin="0"
       padding="0"
+      backgroundColor="whiteAlpha.100"
     >
       <TopMenu />
 
@@ -68,16 +69,16 @@ export default function Establishments() {
           alignContent="flex-end"
           width="100%"
           borderRadius="md"
-          border="1px"
-          borderColor="ButtonShadow"
           padding="2"
+          backgroundColor="whiteAlpha.200"
+          shadow="md"
         >
 
           <Table variant="simple">
             <TableCaption>Imperial to metric conversion factors</TableCaption>
             <Thead>
               <Tr>
-                <Th>Razão Socila</Th>
+                <Th>Razão Social</Th>
                 <Th>CNPJ</Th>
                 <Th>E-mail</Th>
                 <Th>Telefone</Th>

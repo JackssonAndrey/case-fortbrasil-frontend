@@ -6,6 +6,8 @@ import DetailsEstablishment from '../pages/Establishments/Details';
 import EditEstablishment from '../pages/Establishments/Edit';
 import RegisterEstablishment from '../pages/Establishments/Register';
 import Login from '../pages/Login';
+import Profile from '../pages/Profile';
+import Register from '../pages/Register';
 
 export default function Routes() {
   return (
@@ -16,6 +18,8 @@ export default function Routes() {
       <Route exact path="/establishments/register" component={RegisterEstablishment} />
       <Route exact path="/establishments/details/:id" component={DetailsEstablishment} />
       <Route exact path="/establishments/edit/:id" component={EditEstablishment} />
+      <Route exact path="/register" component={Register} />
+      <Route exact path="/profile" component={Profile} />
 
     </Switch>
   );

@@ -57,9 +57,10 @@ export default function DetailsEstablishment({ match }) {
       justifyContent="center"
       flexDirection="column"
       maxWidth="100vw"
-      height="100vh"
+      height="100%"
       margin="0"
       padding="0"
+      backgroundColor="whiteAlpha.100"
     >
       <TopMenu />
 
@@ -99,7 +100,10 @@ export default function DetailsEstablishment({ match }) {
 
         <Box
           width="100%"
-          paddingBottom="30px"
+          padding="30px"
+          backgroundColor="whiteAlpha.200"
+          borderRadius="md"
+          shadow="md"
         >
           <form onSubmit={(e) => handleRegister(e)}>
             <Box
