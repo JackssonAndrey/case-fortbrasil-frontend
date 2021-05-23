@@ -26,6 +26,7 @@ import history from '../../services/history';
 import api from '../../services/api';
 
 import TopMenu from '../../components/TopMenu';
+import Footer from '../../components/Footer';
 
 export default function Establishments() {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,10 +128,15 @@ export default function Establishments() {
               {
                 allEstablishments.map((establishment) => (
                   <Tr key={establishment.id}>
-                    <Td>{establishment.companyName}</Td>
+                    <Td>
+                      <Link to={`/establishments/edit/${establishment.id}`} className="link">
+                        {establishment.companyName}
+                      </Link>
+                    </Td>
                     <Td>{establishment.cnpj}</Td>
                     <Td>{establishment.mail}</Td>
                     <Td>{establishment.phone}</Td>
+
                     <Td>
                       <Button
                         variant="ghost"
@@ -154,7 +160,7 @@ export default function Establishments() {
             </Tbody>
           </Table>
         </Box>
-
+        <Footer />
       </Container>
 
       <Modal isOpen={isOpen} onClose={closeModalDelete}>

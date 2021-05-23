@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import {
-  Container, Box, FormControl, Input, FormLabel, Button, Heading, Text,
+  Container,
+  Box,
+  FormControl,
+  Input,
+  FormLabel,
+  Button,
+  Heading,
+  Text,
+  CircularProgress,
+  useToast,
 } from '@chakra-ui/react';
+import dayjs from 'dayjs';
 import TopMenu from '../../components/TopMenu';
+import Footer from '../../components/Footer';
 import api from '../../services/api';
+import { Context } from '../../Context/AuthContext';
 
 const initialUserDataSate = {
   firstName: '',
@@ -19,8 +31,13 @@ const initialPasswordState = {
 };
 
 export default function Profile() {
+  const toast = useToast();
+  const { handleLogout } = useContext(Context);
   const [userData, setUserData] = useState(initialUserDataSate);
   const [passwordData, setPasswordData] = useState(initialPasswordState);
+  const [isHiddenLoadingUpdateProfile, setIsHiddenLoadingUpdateProfile] = useState(true);
+  const [isHiddenLoadingChangePassword, setIsHiddenLoadingChangePassword] = useState(true);
+  const [isHiddenLoadingDeactivateAccount, setIsHiddenLoadingDeactivateAccount] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -49,9 +66,100 @@ export default function Profile() {
         firstName: userData.firstName,
         lastName: userData.lastName,
       });
-      setUserData(data);
+      setIsHiddenLoadingUpdateProfile(false);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Atualziação feita',
+          description: 'Perfil atualziado com sucesso',
+          position: 'top',
+        });
+        setUserData(data);
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingUpdateProfile(true);
+      }, 3000);
     } catch (error) {
-      console.log(error.message);
+      setIsHiddenLoadingUpdateProfile(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na atualização',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingUpdateProfile(true);
+      }, 3000);
+    }
+  }
+
+  async function changePassword() {
+    try {
+      await api.put('/users/password', passwordData);
+      setIsHiddenLoadingChangePassword(false);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Atualziação feita',
+          description: 'Senha atualziada com sucesso',
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingChangePassword(true);
+      }, 3000);
+    } catch (error) {
+      setIsHiddenLoadingChangePassword(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na atualização',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingChangePassword(true);
+      }, 3000);
+    }
+  }
+
+  async function deactivateAccount() {
+    try {
+      await api.put('/users/deactivate');
+      setIsHiddenLoadingDeactivateAccount(false);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Operação feita',
+          description: 'Sua conta foi excluída',
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        handleLogout();
+      }, 4000);
+    } catch (error) {
+      setIsHiddenLoadingDeactivateAccount(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na operação',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingDeactivateAccount(true);
+      }, 3000);
     }
   }
 
@@ -66,6 +174,7 @@ export default function Profile() {
       margin="0"
       padding="0"
       backgroundColor="whiteAlpha.100"
+      pb="5"
     >
       <TopMenu />
 
@@ -91,7 +200,11 @@ export default function Profile() {
             {' '}
             {userData.firstName}
           </Heading>
-          <Text mb="20px" fontSize="sm">Você é membro desde 20/01/2021</Text>
+          <Text mb="20px" fontSize="sm">
+            Você é membro desde
+            {' '}
+            {dayjs(userData.created_at).format('DD-MM-YYYY')}
+          </Text>
         </Box>
 
         <Box
@@ -162,7 +275,20 @@ export default function Profile() {
           </FormControl>
 
           <FormControl>
-            <Button variant="solid" colorScheme="blue" onClick={handleUpdateProfile}>Salvar Alterações</Button>
+            <Button
+              variant="solid"
+              colorScheme="blue"
+              onClick={handleUpdateProfile}
+            >
+              Salvar Alterações
+              <CircularProgress
+                hidden={isHiddenLoadingUpdateProfile}
+                size={5}
+                ml="2"
+                isIndeterminate
+                color="blue.1000"
+              />
+            </Button>
           </FormControl>
         </Box>
 
@@ -219,9 +345,65 @@ export default function Profile() {
           </Box>
 
           <FormControl>
-            <Button variant="solid" colorScheme="blue">Salvar Alterações</Button>
+            <Button
+              variant="solid"
+              colorScheme="blue"
+              onClick={changePassword}
+            >
+              Salvar Alterações
+              <CircularProgress
+                hidden={isHiddenLoadingChangePassword}
+                size={5}
+                ml="2"
+                isIndeterminate
+                color="blue.1000"
+              />
+            </Button>
           </FormControl>
         </Box>
+
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignContent="center"
+          flexDirection="column"
+          width="60%"
+          height="auto"
+          borderRadius="md"
+          padding="30px"
+          backgroundColor="whiteAlpha.200"
+          shadow="md"
+          margin="auto"
+          mt="5"
+        >
+          <Heading as="h3" size="lg" mb="4">Apagar conta</Heading>
+          <Box
+            width="100%"
+            display="flex"
+          >
+            <Heading as="h5" size="sm">
+              Esta operação não pode ser desfeita. Tenha certeza de que quer apagar sua conta.
+            </Heading>
+          </Box>
+
+          <FormControl mt="4">
+            <Button
+              variant="solid"
+              colorScheme="red"
+              onClick={deactivateAccount}
+            >
+              Apagar conta
+              <CircularProgress
+                hidden={isHiddenLoadingDeactivateAccount}
+                size={5}
+                ml="2"
+                isIndeterminate
+                color="blue.1000"
+              />
+            </Button>
+          </FormControl>
+        </Box>
+        <Footer />
       </Container>
     </Container>
   );

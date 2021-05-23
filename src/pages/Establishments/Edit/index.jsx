@@ -11,10 +11,14 @@ import {
   FormLabel,
   Input,
   Button,
+  CircularProgress,
+  useToast,
 } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
+import Footer from '../../../components/Footer';
 import api from '../../../services/api';
+import history from '../../../services/history';
 
 import './styles.css';
 
@@ -37,8 +41,10 @@ const initialStateEstablishment = {
 };
 
 export default function EditEstablishment({ match }) {
+  const toast = useToast();
   const establishmentId = match.params.id;
   const [establishmentData, setEstablishmentData] = useState(initialStateEstablishment);
+  const [isHiddenLoadingEdit, setIsHiddenLoadingEdit] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -56,14 +62,38 @@ export default function EditEstablishment({ match }) {
     setEstablishmentData({ ...establishmentData, [name]: value });
   }
 
-  async function handleRegister(e) {
+  async function handleEdit(e) {
     e.preventDefault();
 
     try {
       await api.put('/establishments', establishmentData);
-      alert('Atualizado com sucesso');
+      setIsHiddenLoadingEdit(false);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Falha na atualizaçaõ',
+          description: '',
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        history.push(`/establishments/details/${establishmentId}`);
+      }, 4000);
     } catch (error) {
-      console.log(error.message);
+      setIsHiddenLoadingEdit(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na atualizaçaõ',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingEdit(true);
+      }, 3000);
     }
   }
 
@@ -122,7 +152,7 @@ export default function EditEstablishment({ match }) {
           borderRadius="md"
           shadow="md"
         >
-          <form onSubmit={(e) => handleRegister(e)}>
+          <form onSubmit={(e) => handleEdit(e)}>
             <Box
               width="100%"
               display="flex"
@@ -366,10 +396,18 @@ export default function EditEstablishment({ match }) {
                 colorScheme="blue"
               >
                 Salvar Alterações
+                <CircularProgress
+                  hidden={isHiddenLoadingEdit}
+                  size={5}
+                  ml="2"
+                  isIndeterminate
+                  color="blue.1000"
+                />
               </Button>
             </Box>
           </form>
         </Box>
+        <Footer />
       </Container>
     </Container>
   );

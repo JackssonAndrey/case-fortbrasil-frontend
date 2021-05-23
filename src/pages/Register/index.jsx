@@ -12,7 +12,12 @@ import {
   Input,
   Text,
   Center,
+  useToast,
+  CircularProgress,
 } from '@chakra-ui/react';
+
+import api from '../../services/api';
+import history from '../../services/history';
 
 const initialUserDataSate = {
   firstName: '',
@@ -22,7 +27,9 @@ const initialUserDataSate = {
 };
 
 export default function Register() {
+  const toast = useToast();
   const [userData, setUserData] = useState(initialUserDataSate);
+  const [isHiddenLoadingRegister, setIsHiddenLoadingRegister] = useState(true);
 
   function onChangeInputs(e) {
     const { name, value } = e.target;
@@ -31,6 +38,37 @@ export default function Register() {
 
   async function handleSubmitForm(e) {
     e.preventDefault();
+
+    try {
+      await api.post('/users', userData);
+      setIsHiddenLoadingRegister(true);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Cadastro feito',
+          description: 'Sua conta foi criada, faça login.',
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        history.push('/');
+      }, 4000);
+    } catch (error) {
+      setIsHiddenLoadingRegister(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na cadastro',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingRegister(true);
+      }, 3000);
+    }
   }
 
   return (
@@ -147,6 +185,13 @@ export default function Register() {
                 _focus={{ border: 'none' }}
               >
                 Salvar
+                <CircularProgress
+                  hidden={isHiddenLoadingRegister}
+                  size={5}
+                  ml="2"
+                  isIndeterminate
+                  color="blue.1000"
+                />
               </Button>
             </FormControl>
 

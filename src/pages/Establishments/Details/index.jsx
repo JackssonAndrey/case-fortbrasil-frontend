@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
+import Footer from '../../../components/Footer';
 import api from '../../../services/api';
 
 import './styles.css';
@@ -357,6 +358,7 @@ export default function DetailsEstablishment({ match }) {
             </FormControl>
           </form>
         </Box>
+        <Footer />
       </Container>
     </Container>
   );

@@ -11,10 +11,14 @@ import {
   FormLabel,
   Input,
   Button,
+  useToast,
+  CircularProgress,
 } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import TopMenu from '../../../components/TopMenu';
+import Footer from '../../../components/Footer';
 import api from '../../../services/api';
+import history from '../../../services/history';
 
 const initialStateEstablishment = {
   companyName: '',
@@ -35,7 +39,9 @@ const initialStateEstablishment = {
 };
 
 export default function RegisterEstablishment() {
+  const toast = useToast();
   const [establishmentData, setEstablishmentData] = useState(initialStateEstablishment);
+  const [isHiddenLoadingRegister, setIsHiddenLoadingRegister] = useState(true);
 
   function onChangeInputs(e) {
     const { name, value } = e.target;
@@ -47,9 +53,33 @@ export default function RegisterEstablishment() {
 
     try {
       await api.post('/establishments', establishmentData);
-      alert('Cadastrado com sucesso');
+      setIsHiddenLoadingRegister(true);
+      setTimeout(() => {
+        toast({
+          status: 'success',
+          duration: 5000,
+          title: 'Cadastro feito',
+          description: 'Estabelecimento cadastro com sucesso',
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        history.push('/establishments');
+      }, 4000);
     } catch (error) {
-      console.log(error.message);
+      setIsHiddenLoadingRegister(false);
+      setTimeout(() => {
+        toast({
+          status: 'error',
+          duration: 5000,
+          title: 'Falha na cadastro',
+          description: `${error.message}`,
+          position: 'top',
+        });
+      }, 2000);
+      setTimeout(() => {
+        setIsHiddenLoadingRegister(true);
+      }, 3000);
     }
   }
 
@@ -350,10 +380,18 @@ export default function RegisterEstablishment() {
                 colorScheme="blue"
               >
                 Salvar
+                <CircularProgress
+                  hidden={isHiddenLoadingRegister}
+                  size={5}
+                  ml="2"
+                  isIndeterminate
+                  color="blue.1000"
+                />
               </Button>
             </Box>
           </form>
         </Box>
+        <Footer />
       </Container>
     </Container>
   );

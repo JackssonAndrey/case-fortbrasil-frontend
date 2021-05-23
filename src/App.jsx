@@ -7,6 +7,8 @@ import history from './services/history';
 import customTheme from './styles/theme';
 import { AuthProvider } from './Context/AuthContext';
 
+import './styles/global.css';
+
 function App() {
   return (
     <ChakraProvider theme={customTheme}>
