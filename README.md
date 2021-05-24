@@ -17,6 +17,10 @@
     <img alt="GitHub" src="https://img.shields.io/github/license/jackssonandrey/case-fortbrasil-frontend?style=for-the-badge">
 </h2>
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/31444727/119288770-9aad7880-bc1f-11eb-9577-18993ea575ed.png" />
+</p>
+
 ## 🗂️ Índice
 
 - [Índice](#index)
